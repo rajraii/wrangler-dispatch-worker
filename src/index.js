@@ -1,15 +1,22 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
-
 export default {
-	async fetch(request, env, ctx) {
-		return new Response('Hello World!');
-	},
+  async fetch(request, env) {
+    try {
+      // parse the URL, read the subdomain
+      let workerName = new URL(request.url).hostname.split('.')[0];
+      // remove the environment from the worker name
+      workerName = workerName.replace(/-(dev|prod|beta|test)$/, '');
+      
+      // Fetch the worker based on the subdomain and environment
+      let userWorker = env.dispatcher.get(workerName);
+      return await userWorker.fetch(request);
+    } catch (e) {
+      if (e.message.startsWith('Worker not found')) {
+        // Handle case where worker is not found in the dispatch namespace
+        return new Response('', { status: 404 });
+      }
+
+      // Handle any other errors (e.g., fetch error or worker-specific errors)
+      return new Response(e.message, { status: 500 });
+    }
+  }
 };

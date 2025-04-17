@@ -9,7 +9,13 @@
 	"compatibility_date": "2025-04-17",
 	"observability": {
 		"enabled": true
-	}
+	},
+	"dispatch_namespaces": [
+		{
+			"binding": "dispatcher",
+			"namespace": "dev-testing"
+		}
+  ]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
